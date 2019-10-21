@@ -17,7 +17,7 @@ describe('User', () => {
         email: 'danubio@gmail.com',
         password_hash: '123456',
       });
-    expect(response.body).to.HaveProperty('id');
+    expect(response.body).toHaveProperty('id');
   });
 
   // Verificação de email duplicado
