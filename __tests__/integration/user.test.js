@@ -1,7 +1,8 @@
 import request from 'supertest';
+import bcrypt from 'bcryptjs';
 
 import app from '../../src/app';
-
+import User from '../../src/app/models/User';
 import truncate from '../util/truncate';
 
 describe('User', () => {
@@ -15,9 +16,21 @@ describe('User', () => {
       .send({
         name: 'Danubio de Araujo',
         email: 'danubio@gmail.com',
-        password_hash: '123456',
+        password: '123456',
       });
     expect(response.body).toHaveProperty('id');
+  });
+
+  // Verificação da cryptografia da senha
+  it('should encrypt user password when new created', async () => {
+    const user = await User.create({
+      name: 'Danubio de Araujo',
+      email: 'danubio@gmail.com',
+      password: '123456',
+    });
+    const compareHash = await bcrypt.compare('123456', user.password_hash);
+
+    expect(compareHash).toBe(true);
   });
 
   // Verificação de email duplicado
@@ -27,14 +40,14 @@ describe('User', () => {
       .send({
         name: 'Danubio de Araujo',
         email: 'danubio@gmail.com',
-        password_hash: '123456',
+        password: '123456',
       });
     const response = await request(app)
       .post('/users')
       .send({
         name: 'Danubio de Araujo',
         email: 'danubio@gmail.com',
-        password_hash: '123456',
+        password: '123456',
       });
     expect(response.status).toBe(400);
   });
